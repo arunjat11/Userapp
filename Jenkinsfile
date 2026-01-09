@@ -7,10 +7,14 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout([scm,
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/master']],
+                    userRemoteConfigs: [[url: 'https://github.com/arunjat11/Userapp.git']],
                     extensions: [
                         [$class: 'CloneOption', depth: 1, noTags: true, shallow: true, timeout: 30]
-                     ]])
+                     ]
+                    ])
             }
         }
 
