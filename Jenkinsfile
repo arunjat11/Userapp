@@ -7,7 +7,10 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout([scm,
+                    extensions: [
+                        [$class: 'CloneOption', depth: 1, noTags: true, shallow: true, timeout: 30]
+                     ]])
             }
         }
 
