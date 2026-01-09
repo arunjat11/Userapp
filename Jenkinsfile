@@ -1,11 +1,7 @@
 pipeline {
 
 
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17'
-        }
-    }
+    agent any
 
     stages {
 
@@ -15,32 +11,29 @@ pipeline {
             }
         }
 
-        stage('Compile') {
+        stage('Build') {
+        		agent {
+        			docker {
+           				 image 'maven:3.9.6-eclipse-temurin-17'
+       				 }
+    			}
             steps {
-                sh 'mvn clean compile'
+                 sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
-        stage('Package') {
-            steps {
-                sh 'mvn package -DskipTests'
-            }
-        }
-
-       stage('Build') {
-            steps {
-                echo 'build'
-                sh 'docker compose up -d --build'
-                echo 'application is running'
-            }
-        }
-    }
+ 		stage('Docker Build') {
+    		steps {
+        		sh 'docker build -t userapp:latest .'
+    		}
+		}
+		
+		stage('Deploy') {
+   		 	steps {
+        		sh 'docker compose up -d --build'
+    		}
+		}
+	}
 
     post {
         success {
