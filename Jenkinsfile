@@ -1,24 +1,7 @@
 pipeline {
-    agent {
-        label 'docker'
-    }
 
-    tools {
-        maven 'Maven3'
-        jdk 'JDK17'
-    }
 
-    environment {
-        APP_NAME = userapp'
-        NEXUS_REGISTRY = 'nexus.mycompany.com:8083'
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
-    }
-
-    options {
-        timestamps()
-        disableConcurrentBuilds()
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
+    agent any
 
     stages {
 
@@ -46,43 +29,22 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
-            when {
-                branch 'main'
-            }
+       stage('Build') {
             steps {
-                sh """
-                  docker build -t ${NEXUS_REGISTRY}/${APP_NAME}:${IMAGE_TAG} .
-                """
-            }
-        }
-
-        stage('Docker Push') {
-            when {
-                branch 'main'
-            }
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'nexus-docker-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh """
-                      docker login ${NEXUS_REGISTRY} -u $DOCKER_USER -p $DOCKER_PASS
-                      docker push ${NEXUS_REGISTRY}/${APP_NAME}:${IMAGE_TAG}
-                    """
-                }
+                echo 'build'
+                sh 'docker-compose up -d --build'
+                echo 'application is running'
             }
         }
     }
 
     post {
         success {
-            echo 'CI Pipeline completed successfully'
+            echo 'CICD Pipeline completed successfully'
         }
 
         failure {
-            echo 'CI Pipeline failed'
+            echo 'CICD Pipeline failed'
         }
 
         always {
