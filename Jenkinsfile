@@ -3,6 +3,10 @@ pipeline {
 
     agent any
 
+  	options {
+        timeout(time: 45, unit: 'MINUTES')   // whole job protection
+    }
+
     stages {
 
         stage('Checkout') {
