@@ -27,4 +27,3 @@ jobs:
           push: true
           tags: |
             arunjat/userapp_new_cicd-springboot:latest
-            arunjat/springboot:github-${{ github.run_number }}
